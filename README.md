@@ -5,7 +5,7 @@ then choose the polar pattern after the take: omni, cardioid, figure-8 and every
 It also corrects the capsules, removes or adds proximity effect, adds off-axis colour, and has a
 Stereo 180 mode (two virtual mics, one facing front, one facing back).
 
-**v0.2.1.** Plugin formats: **VST3** and **Standalone** (Windows, macOS), **AU** (macOS).
+**v0.2.2.** Plugin formats: **VST3** and **Standalone** (Windows, macOS), **AU** (macOS).
 
 ## Download
 

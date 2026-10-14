@@ -95,7 +95,7 @@ public:
                 juce::String error;
                 auto e = owner.build(s, fs, error);
                 lastBuilt = s;
-                if (fs == owner.sampleRate.load()) owner.install(std::move(e), s, error);
+                if (std::abs(fs - owner.sampleRate.load()) < 1e-6) owner.install(std::move(e), s, error);   // else prepareToPlay changed the rate
             }
         }
     }
