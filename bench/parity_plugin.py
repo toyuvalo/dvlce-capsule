@@ -47,11 +47,13 @@ RANGES = dict(pattern=(0, 1, 1), pattern_rear=(0, 1, 1), source_distance=(0, 200
 
 
 def set_param(name, v):
+    # VST3 appends the unit to some names (proximity_cap_db); AU does not (proximity_cap)
+    key = name if name in plug.parameters else name.removesuffix("_db")
     if name in RANGES:
         a, b, skew = RANGES[name]
-        plug.parameters[name].raw_value = ((v - a) / (b - a)) ** skew
+        plug.parameters[key].raw_value = ((v - a) / (b - a)) ** skew
     else:
-        setattr(plug, name, v)
+        setattr(plug, key, v)
 
 rng = np.random.default_rng(3)
 fails = 0

@@ -54,6 +54,8 @@ void DvlceCapsuleEditor::setupKnob(Knob& k, const char* id, const char* text) {
     addAndMakeVisible(k.slider);
     addAndMakeVisible(k.label);
     k.attach = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(proc.params, id, k.slider);
+    const juce::String unit = proc.params.getParameter(id)->getLabel();   // dB, %
+    if (unit.isNotEmpty()) k.slider.setTextValueSuffix(" " + unit);
 }
 
 void DvlceCapsuleEditor::setupChoice(Choice& c, const char* id, const char* text) {

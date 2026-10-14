@@ -47,3 +47,8 @@ target_link_libraries(DvlceCapsule
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_warning_flags)
+
+# Offscreen editor snapshot (a GUI check without a window): DvlceCapsuleSnapshot <out.png> [voicing index]
+add_executable(DvlceCapsuleSnapshot tools/editor_snapshot.cpp)
+target_link_libraries(DvlceCapsuleSnapshot PRIVATE DvlceCapsule)
+target_include_directories(DvlceCapsuleSnapshot PRIVATE "${juce_SOURCE_DIR}/modules")

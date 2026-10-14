@@ -5,7 +5,9 @@ then choose the polar pattern after the take: omni, cardioid, figure-8 and every
 It also corrects the capsules, removes or adds proximity effect, adds off-axis colour, and has a
 Stereo 180 mode (two virtual mics, one facing front, one facing back).
 
-**v0.2.2.** Plugin formats: **VST3** and **Standalone** (Windows, macOS), **AU** (macOS).
+![Dvlce Capsule editor](docs/editor.png)
+
+**v0.2.3.** Plugin formats: **VST3** and **Standalone** (Windows, macOS), **AU** (macOS).
 
 ## Download
 
@@ -47,6 +49,7 @@ Needs CMake 3.22 or newer and a C++17 compiler. JUCE 8.0.13 is fetched automatic
 
 The build also runs the C++ tests: the model-file rules, real-time checks, and a comparison with the
 Python prototype (needs Python with numpy and scipy).
+Render the editor to a PNG without a window: `DvlceCapsuleSnapshot <out.png> [voicing index]` (built with the plugin).
 Check a built plugin against the prototype: `python bench/parity_plugin.py "<path to the plugin binary>"` (needs `pedalboard`).
 
 The Python prototype:
