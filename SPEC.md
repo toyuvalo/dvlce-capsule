@@ -4,7 +4,9 @@ Goal: an engine that turns the two coincident capsule signals of a dual-capsule 
 virtual polar pattern, plus a documented model-file format. Everything in §2 to §6 is public first-order
 acoustics. All code here is our own.
 
-Status: Python prototype in `proto/` (134 tests on simulated recordings, 22 of 22 mutants killed). No C++ yet.
+Status (v0.2.0): Python prototype in `proto/` (134 tests, 22 of 22 mutants killed). Real-time C++ core in `core/`
+(equal to the prototype within 2e-14 on 10 reference cases). JUCE plugin in `plugin/` (VST3, AU, Standalone),
+pluginval strictness 10, the built plugin equal to the prototype within 1e-7 (float audio) (§13).
 
 ## 1. Scope
 In the open engine: pattern synthesis, capsule correction, proximity effect (remove and add), off-axis
@@ -43,7 +45,7 @@ A spherical wave from distance `r` raises the gradient term: `D -> D * G`, `G(f)
 Prototype result: simulator equals the textbook formula to 1e-4; removal restores a flat response to
 within 0.012 (linear) from 100 Hz to 8 kHz for r = 3, 10, 50 cm; added effect matches the textbook
 `|G|` (figure-8) and `|1/2 + G/2|` (cardioid) within 0.35 dB, 124 Hz to 4 kHz, r = 5 cm to 1 m.
-Not tested: corner frequencies near Nyquist (the bilinear transform warps them). Use a prewarped design in C++.
+Not tested: corner frequencies near Nyquist (the bilinear transform warps them). The C++ uses the same transform; at normal distances the corners are below 100 Hz.
 
 ## 5. Off-axis colour
 Only a dual-capsule pair at one axis can tell the angle of one source: for a plane wave `D = cos(theta) * O`
@@ -98,7 +100,7 @@ Rules (enforced by `Model.from_dict`, 13 rejection tests):
 - `pattern_eq` keys are numbers in 0..1. A voicing may have any number of anchors; one anchor is flat in `p`.
 - `off_axis`: `angle_deg` ascending from 0 to at most 180; the 0 deg row is the 0 dB reference (subtracted on load).
 - `nonlinearity`: `y = (tanh(a (x + b)) - tanh(a b)) / (a (1 - tanh^2(a b)))`, `a = 10^(drive_db/20)`, `b = asymmetry`.
-  Unity small-signal gain; odd harmonics from the tanh, even harmonics from `b`; DC removed (5 Hz one-pole). C++ runs it 4x oversampled.
+  Unity small-signal gain; odd harmonics from the tanh, even harmonics from `b`; DC removed (5 Hz one-pole). The C++ runs it at the session rate, like the prototype (no oversampling yet, §12).
 - `capsule` and `voicing` can be in separate files. The plugin has two slots: *Hardware* and *Voicing*.
 - Unknown keys are ignored (room for later versions); a higher `version` is an error.
 Example files: `proto/models/` (`capsule-example`, `generic-neutral`, `generic-bright`, `generic-warm`). Made by `proto/make_models.py`. Same licence as the code (§11).
@@ -106,40 +108,57 @@ Example files: `proto/models/` (`capsule-example`, `generic-neutral`, `generic-b
 ## 9. Controls
 | Control | Range | Note |
 |---|---|---|
-| Pattern | 0 figure-8 .. 0.5 cardioid .. 1 omni | stops at the named patterns; continuous in between |
+| Pattern | 0 figure-8 .. 0.5 cardioid .. 1 omni, steps of 0.01 | the display names figure-8, hypercardioid, cardioid, subcardioid, omni |
 | Pattern rear | same | Stereo 180 only |
-| Mode | Mono / Stereo 180 | |
-| Flip | off / on | |
-| Source distance | off, 2 cm .. 200 cm | removes proximity effect |
-| Virtual distance | off, 2 cm .. 200 cm | adds proximity effect |
+| Mode | Mono / Stereo 180 | Mono copies the one virtual mic to both outputs |
+| Flip | off / on | swaps the two inputs (mic turned round) |
+| Source distance | Off (0), up to 200 cm | removes the proximity effect of a source at this distance |
+| Virtual distance | Off (0), up to 200 cm | adds the proximity effect of this distance |
 | Proximity cap | 10 .. 40 dB | limit of the added bass boost |
 | Off-axis | 0 .. 100 % | needs a voicing with an `off_axis` table |
 | Drive | off / on | needs a voicing with a `nonlinearity` |
 | Output | -24 .. +24 dB | |
-| Hardware / Voicing | file slots | built-in generic voicings load by name |
-Inputs: ch1 = front capsule, ch2 = rear capsule (the order is a setting: *Flip*). Outputs: 1 or 2 channels.
-Presets and names are ours.
+| Hardware | None, Example capsule pair, User file | capsule tables of a model file |
+| Voicing | None, Neutral, Bright, Warm, User file | voicing part of a model file |
+Inputs: ch1 = front capsule, ch2 = rear capsule (stereo input bus). Outputs: mono or stereo.
+The Hardware slot uses only the `capsule` part of its file, the Voicing slot only the `voicing` part.
+A user file is checked by the same rules as §8 and saved inside the session. A refused file shows the reason.
+Pattern EQ: the C++ designs it on the 0.01 pattern grid at model load and crossfades over 64 samples on a change.
 
 ## 10. Latency and cost
 | Stage | Latency | Note |
 |---|---|---|
-| Capsule correction, pattern mix, proximity, voicing EQ | 0 to a few samples | min-phase; the prototype peak offset is within 1 sample |
-| Off-axis colour | 768 samples at any rate (STFT 1024, hop 256) | only when the loaded voicing has an off_axis table; reported at load time, constant |
-| Nonlinearity | oversampler delay | only when Drive is on and the model has one |
-The prototype is offline (whole array). The C++ port is block based. For cost, replace the 1024-tap FIRs by
-biquad cascades fitted to each table, or by a zero-latency partitioned convolver.
+| Capsule correction, pattern mix, proximity, voicing EQ | 0 | min-phase FIRs of 1024 taps, zero-latency partitioned convolution (64 direct + 15 x 64 by FFT) |
+| Off-axis colour | 1022 samples at any rate (STFT 1024, hop 256) | only when the voicing has an off_axis table; then always on (also at 0 %), so the latency is constant per model |
+| Nonlinearity | 0 | at the session rate |
+The 1022 is exact: an STFT sample is complete once the newest frame that covers it with a non-zero window weight is done.
+The plugin reports it to the host. CPU, one core of the studio PC (Windows, MSVC, 48 kHz), as speed over real time:
+unity 3600x, capsule tables 71x, pattern EQ 171x, pattern EQ + off-axis 47x, heaviest stereo case 16x.
+The off-axis STFT is the largest cost (4 FFTs of 1024 per 256 samples per output).
 
 ## 11. Licence
 PolyForm Noncommercial 1.0.0 (`LICENSE`), for the code, this spec and the example models.
 - Free for any non-commercial use: personal, hobby, research, education, charities, public bodies. You may change it and share it.
 - Commercial use (selling it, shipping it inside a paid product, using it for paid work) needs a separate licence from the author. See `COMMERCIAL.md`.
 - This is source-available, not OSI "open source": an OSI licence cannot forbid commercial use.
-- A future plugin shell that links JUCE must also meet JUCE's own licence terms (AGPL-3.0 or a JUCE commercial tier).
+- The plugin links JUCE 8, which has its own licence (AGPLv3 or a JUCE licence; README "Building the plugin").
 - Contributions: see `CONTRIBUTING.md` (they must allow the author to keep offering commercial licences).
 This is a summary; the `LICENSE` text governs.
 
 ## 12. Not done, or unknown
 - Real capsule data: none yet. The capsule tables in `models/capsule-example.json` are invented.
-- C++ port, GUI, plugin ID, installer.
+- Oversampling of the nonlinearity (it aliases a little at high drive).
+- Cheaper off-axis STFT (real FFTs, shared O and D spectra between the two outputs).
+- Installers and code signing (macOS builds are not notarised).
 - Multiple sources per bin for off-axis colour (§5) and moving sources.
-- Sample rates other than 48 kHz in the prototype (the table design takes `fs`; only 48 kHz is tested).
+- Prototype tests run at 48 kHz only; the C++ also runs at 44.1, 96 and 192 kHz (finite, bounded output) but is not compared there.
+
+## 13. Verification
+| Check | Where | Result (v0.2.0) |
+|---|---|---|
+| Prototype suite + mutation | `proto/`: `pytest`, `mutate.py` | 134 pass, 22 of 22 mutants killed |
+| C++ core vs prototype | `core/tests/` (`build-win.bat`, `build-mac.sh` run it) | 10 cases, max error 1.75e-14 |
+| C++ model-file rules | same | the 13 prototype rejections + malformed JSON |
+| Real-time properties | same | block-size invariant (bit-exact), silence in = silence out, parameter changes bounded |
+| Plugin validation | pluginval `--strictness-level 10` | pass (Windows VST3) |
+| Built plugin vs prototype | `bench/parity_plugin.py <plugin>` | 5 cases, max error 8.9e-8 (float32 I/O) |
