@@ -4,7 +4,7 @@ Goal: an engine that turns the two coincident capsule signals of a dual-capsule 
 virtual polar pattern, plus a documented model-file format. Everything in §2 to §6 is public first-order
 acoustics. All code here is our own.
 
-Status (v0.2.0): Python prototype in `proto/` (134 tests, 22 of 22 mutants killed). Real-time C++ core in `core/`
+Status (v0.2.1): Python prototype in `proto/` (134 tests, 22 of 22 mutants killed). Real-time C++ core in `core/`
 (equal to the prototype within 2e-14 on 10 reference cases). JUCE plugin in `plugin/` (VST3, AU, Standalone),
 pluginval strictness 10, the built plugin equal to the prototype within 1e-7 (float audio) (§13).
 
@@ -154,7 +154,7 @@ This is a summary; the `LICENSE` text governs.
 - Prototype tests run at 48 kHz only; the C++ also runs at 44.1, 96 and 192 kHz (finite, bounded output) but is not compared there.
 
 ## 13. Verification
-| Check | Where | Result (v0.2.0) |
+| Check | Where | Result (v0.2.1) |
 |---|---|---|
 | Prototype suite + mutation | `proto/`: `pytest`, `mutate.py` | 134 pass, 22 of 22 mutants killed |
 | C++ core vs prototype | `core/tests/` (`build-win.bat`, `build-mac.sh` run it) | 10 cases, max error 1.75e-14 |
