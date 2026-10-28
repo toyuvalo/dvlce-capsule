@@ -6,6 +6,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "PluginProcessor.h"
+#include "ui/QuantumHeader.h"
 
 class DvlceCapsuleEditor : public juce::AudioProcessorEditor, private juce::Timer {
 public:
@@ -38,7 +39,8 @@ private:
     void chooseFile(int slot);
 
     DvlceCapsuleProcessor& proc;
-    juce::LookAndFeel_V4 look;
+    dvlce::ui::DvlceLookAndFeel look{dvlce::ui::ThemeId::Quantum};
+    dvlce::ui::QuantumHeader header;
     Knob pattern, patternRear, sourceDist, virtualDist, proxCap, offAxis, output;
     Choice hardware, voicing, mode;
     Toggle flip, drive;

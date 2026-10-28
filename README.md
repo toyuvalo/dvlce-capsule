@@ -7,7 +7,7 @@ Stereo 180 mode (two virtual mics, one facing front, one facing back).
 
 ![Dvlce Capsule editor](docs/editor.png)
 
-**v0.2.3.** Plugin formats: **VST3** and **Standalone** (Windows, macOS), **AU** (macOS).
+**v0.3.0.** Plugin formats: **VST3** and **Standalone** (Windows, macOS), **AU** (macOS).
 
 ## Download
 
@@ -81,3 +81,28 @@ The code, the spec and the example models are under the
 This is source-available software, not OSI "open source". The `LICENSE` text governs; this section is a summary.
 
 Required Notice: Copyright 2026 Yuval Olsha (https://github.com/toyuvalo)
+
+## Quantum interface and presets (0.3.0)
+
+The amber Quantum interface uses the shared DVLCE knob, chip and font styles.
+The MOTION lamp switches the header animation on or off. This setting is stored with the session
+and remembered for new instances. All hardware, voicing and user model controls remain available.
+
+Use the header arrows or the category menu to load one of 16 designed factory presets.
+These are starting points; use matching front/rear recordings and select your measured hardware model when available. Factory presets use ideal capsules, not a model of a named microphone. Figure Eight Side is a side-channel starting point; it does not rotate a front/rear capsule pair.
+An asterisk marks changed parameter values. SAVE creates a JSON user preset under
+`juce::File::userApplicationDataDirectory/Dvlce/Presets/Capsule/`.
+Repeat names get numbered filenames. User presets include the plugin state
+and embedded custom model data; they do not require the original model file.
+Factory presets are embedded from [presets/factory.json](presets/factory.json), in real parameter units.
+
+The vendored UI code lives in `plugin/Source/ui/`; it has no private repository dependency.
+Rajdhani by Indian Type Foundry and Barlow Semi Condensed by Jeremy Tribby use the SIL Open Font License:
+[OFL-Rajdhani.txt](plugin/Source/ui/fonts/OFL-Rajdhani.txt),
+[OFL-Barlow.txt](plugin/Source/ui/fonts/OFL-Barlow.txt).
+Only the two font families and the needed theme, look-and-feel and header/preset code are included.
+
+GitHub-hosted Windows and macOS workflows build the plugins, run core and preset tests,
+validate at pluginval strictness 10 with GUI tests skipped, and render offscreen editor PNGs.
+The snapshot tool verifies the saved PNG and prints the full-editor paint time at 100%.
+`docs/editor.png` comes from the CI snapshot artifact.

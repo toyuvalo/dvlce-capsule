@@ -1,0 +1,311 @@
+{
+  "format": "dvlce-presets",
+  "version": 1,
+  "plugin": "dvlce-capsule",
+  "presets": [
+    {
+      "name": "Clear Vocal Cardioid",
+      "category": "Vocal",
+      "params": {
+        "pattern": 0.5,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 0,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 1
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Airy Vocal",
+      "category": "Vocal",
+      "params": {
+        "pattern": 0.5,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 20,
+        "virtual_cm": 35,
+        "prox_cap": 18,
+        "off_axis": 0,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 2
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Warm Narration",
+      "category": "Vocal",
+      "params": {
+        "pattern": 0.5,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 25,
+        "prox_cap": 16,
+        "off_axis": 0,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 3
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Proximity Tamed",
+      "category": "Vocal",
+      "params": {
+        "pattern": 0.5,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 10,
+        "virtual_cm": 80,
+        "prox_cap": 18,
+        "off_axis": 0,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 1
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Natural Room Omni",
+      "category": "Room",
+      "params": {
+        "pattern": 1,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 0,
+        "drive": 0,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 0
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Warm Room Omni",
+      "category": "Room",
+      "params": {
+        "pattern": 1,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 30,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 3
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Open Subcardioid",
+      "category": "Room",
+      "params": {
+        "pattern": 0.7,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 0,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 1
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Tight Hypercardioid",
+      "category": "Pattern",
+      "params": {
+        "pattern": 0.25,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 25,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 1
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Figure Eight Side",
+      "category": "Pattern",
+      "params": {
+        "pattern": 0,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 0,
+        "drive": 0,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 0
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Rear Facing Cardioid",
+      "category": "Pattern",
+      "params": {
+        "pattern": 0.5,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 1,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 0,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 1
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Bright Acoustic",
+      "category": "Instrument",
+      "params": {
+        "pattern": 0.5,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 30,
+        "virtual_cm": 60,
+        "prox_cap": 24,
+        "off_axis": 20,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 2
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Close Cabinet",
+      "category": "Instrument",
+      "params": {
+        "pattern": 0.25,
+        "pattern_rear": 0.5,
+        "mode": 0,
+        "flip": 0,
+        "source_cm": 8,
+        "virtual_cm": 45,
+        "prox_cap": 14,
+        "off_axis": 0,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 3
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Stereo 180 Wide",
+      "category": "Stereo 180",
+      "params": {
+        "pattern": 0.5,
+        "pattern_rear": 0.5,
+        "mode": 1,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 0,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 1
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Stereo 180 Tight",
+      "category": "Stereo 180",
+      "params": {
+        "pattern": 0.25,
+        "pattern_rear": 0.25,
+        "mode": 1,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 25,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 1
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Stereo 180 Open Room",
+      "category": "Stereo 180",
+      "params": {
+        "pattern": 0.7,
+        "pattern_rear": 0.7,
+        "mode": 1,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 0,
+        "drive": 1,
+        "output": 0,
+        "hardware": 0,
+        "voicing": 3
+      },
+      "provenance": "designed"
+    },
+    {
+      "name": "Front Focus Rear Room",
+      "category": "Stereo 180",
+      "params": {
+        "pattern": 0.5,
+        "pattern_rear": 1,
+        "mode": 1,
+        "flip": 0,
+        "source_cm": 0,
+        "virtual_cm": 0,
+        "prox_cap": 24,
+        "off_axis": 0,
+        "drive": 1,
+        "output": -3,
+        "hardware": 0,
+        "voicing": 1
+      },
+      "provenance": "designed"
+    }
+  ]
+}

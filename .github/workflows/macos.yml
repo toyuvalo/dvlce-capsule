@@ -1,0 +1,80 @@
+# macOS build (universal AU + VST3 + Standalone) on a GitHub runner.  On a published release it
+# validates the plugin and attaches Dvlce-Capsule-<version>-macOS.zip to that release.
+name: macos
+
+on:
+  push:
+    branches: [main, 'feat/**']
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  mac:
+    runs-on: macos-14
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and test
+        run: JOBS=3 sh ./build-mac.sh
+
+      - name: Presets and snapshots
+        run: |
+          ./build/plugin/DvlceCapsulePresetTest
+          mkdir -p snapshots
+          ./build/plugin/DvlceCapsuleSnapshot snapshots/editor.png 0 1100 520
+          ./build/plugin/DvlceCapsuleSnapshot snapshots/editor-alternate.png 1 1100 520
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-snapshots
+          path: snapshots/*.png
+          if-no-files-found: error
+
+      - name: Ad-hoc sign the bundles
+        run: |
+          A="build/plugin/DvlceCapsule_artefacts/Release"
+          for b in "$A/AU/Dvlce Capsule.component" "$A/VST3/Dvlce Capsule.vst3" "$A/Standalone/Dvlce Capsule.app"; do
+            codesign --force --deep -s - "$b"
+          done
+
+      - name: auval
+        run: |
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R "build/plugin/DvlceCapsule_artefacts/Release/AU/Dvlce Capsule.component" ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar 2>/dev/null || true
+          sleep 3
+          auval -v aufx Dcap Dvlc
+
+      - name: pluginval (VST3 + AU, strictness 10)
+        run: |
+          curl -sSL -o pv.zip https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_macOS.zip
+          unzip -q pv.zip
+          PV=./pluginval.app/Contents/MacOS/pluginval
+          $PV --strictness-level 10 --skip-gui-tests --validate-in-process --validate "build/plugin/DvlceCapsule_artefacts/Release/VST3/Dvlce Capsule.vst3"
+          $PV --strictness-level 10 --skip-gui-tests --validate-in-process --validate ~/Library/Audio/Plug-Ins/Components/"Dvlce Capsule.component"
+
+      - name: Zip
+        run: |
+          V=$(cat VERSION | tr -d '\r')
+          D="Dvlce-Capsule-$V-macOS"
+          A="build/plugin/DvlceCapsule_artefacts/Release"
+          mkdir "$D"
+          cp -R "$A/AU/Dvlce Capsule.component" "$A/VST3/Dvlce Capsule.vst3" "$A/Standalone/Dvlce Capsule.app" "$D/"
+          cp LICENSE COMMERCIAL.md README.md "$D/"
+          ditto -c -k --keepParent "$D" "$D.zip"
+          lipo -info "$D/Dvlce Capsule.vst3/Contents/MacOS/Dvlce Capsule"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-zip
+          path: Dvlce-Capsule-*-macOS.zip
+
+      - name: Attach to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" Dvlce-Capsule-*-macOS.zip --clobber
