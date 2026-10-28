@@ -88,6 +88,7 @@ void DvlceCapsuleEditor::chooseFile(int slot) {
 }
 
 void DvlceCapsuleEditor::timerCallback() {
+    look.reportActivity(proc.uiActivity.load(std::memory_order_relaxed));
     status.setText(loadError.isNotEmpty() ? loadError : proc.statusText(), juce::dontSendNotification);
     status.setColour(juce::Label::textColourId, loadError.isNotEmpty() ? juce::Colours::orangered : kDim);
     const juce::String h = proc.userFileName(0), v = proc.userFileName(1);
