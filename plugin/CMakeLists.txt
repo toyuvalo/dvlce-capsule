@@ -52,3 +52,18 @@ target_link_libraries(DvlceCapsule
 add_executable(DvlceCapsuleSnapshot tools/editor_snapshot.cpp)
 target_link_libraries(DvlceCapsuleSnapshot PRIVATE DvlceCapsule)
 target_include_directories(DvlceCapsuleSnapshot PRIVATE "${juce_SOURCE_DIR}/modules")
+
+# Vendored Quantum UI and OFL typefaces; no private repository dependency.
+juce_add_binary_data(DvlceUiFonts NAMESPACE DvlceUiFonts HEADER_NAME DvlceUiFonts.h SOURCES
+    Source/ui/fonts/Rajdhani-Medium.ttf Source/ui/fonts/Rajdhani-SemiBold.ttf
+    Source/ui/fonts/BarlowSemiCondensed-Medium.ttf Source/ui/fonts/BarlowSemiCondensed-SemiBold.ttf)
+juce_add_binary_data(DvlceFactory NAMESPACE DvlceFactory HEADER_NAME DvlceFactory.h SOURCES ../presets/factory.json)
+target_sources(DvlceCapsule PRIVATE Source/ui/Theme.cpp Source/ui/DvlceLookAndFeel.cpp)
+target_link_libraries(DvlceCapsule PUBLIC DvlceUiFonts DvlceFactory)
+if(MSVC)
+    target_compile_options(DvlceCapsule PRIVATE /utf-8)
+endif()
+
+add_executable(DvlceCapsulePresetTest tools/preset_test.cpp)
+target_link_libraries(DvlceCapsulePresetTest PRIVATE DvlceCapsule dvlce_capsule_core)
+target_include_directories(DvlceCapsulePresetTest PRIVATE "${juce_SOURCE_DIR}/modules")

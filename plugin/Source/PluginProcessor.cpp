@@ -233,6 +233,7 @@ cap::Params DvlceCapsuleProcessor::currentParams() const {
 void DvlceCapsuleProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&) {
     juce::ScopedNoDenormals noDenormals;
     const int n = buffer.getNumSamples();
+    uiActivity.store(n > 0 ? buffer.getMagnitude(0, n) : 0.0f, std::memory_order_relaxed);
     const int inCh = getTotalNumInputChannels(), outCh = buffer.getNumChannels();
     const juce::SpinLock::ScopedTryLockType l(engineLock);
     if (!l.isLocked() || engine == nullptr || inCh < 2 || scratch.getNumSamples() == 0) {

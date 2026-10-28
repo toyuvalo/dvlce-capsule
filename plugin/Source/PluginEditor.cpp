@@ -3,15 +3,14 @@
 #include "PluginEditor.h"
 
 namespace {
-const juce::Colour kBg{0xff16181d}, kPanel{0xff20232a}, kText{0xffe6e6e6}, kDim{0xff9aa0a6}, kAccent{0xffd9a441};
+const juce::Colour kBg{0xff10151b}, kPanel{0xff172028}, kText{0xffe8f0f5}, kDim{0xffa3b4c2}, kAccent{0xffffb21f};
 }
 
-DvlceCapsuleEditor::DvlceCapsuleEditor(DvlceCapsuleProcessor& p) : AudioProcessorEditor(&p), proc(p) {
-    look.setColourScheme(juce::LookAndFeel_V4::getMidnightColourScheme());
-    look.setColour(juce::Slider::rotarySliderFillColourId, kAccent);
-    look.setColour(juce::Slider::thumbColourId, kAccent);
-    look.setColour(juce::ToggleButton::tickColourId, kAccent);
+DvlceCapsuleEditor::DvlceCapsuleEditor(DvlceCapsuleProcessor& p) : AudioProcessorEditor(&p), proc(p),
+    header(p, p.params, look, "Capsule", "dvlce-capsule", DVLCE_CAPSULE_VERSION, "DUAL-CAPSULE VIRTUAL MICROPHONE  /  INPUT 1 FRONT  /  INPUT 2 REAR") {
     setLookAndFeel(&look);
+    addAndMakeVisible(header);
+    header.setBufferedToImage(true);
 
     setupChoice(hardware, "hardware", "Hardware");
     setupChoice(voicing, "voicing", "Voicing");
@@ -38,8 +37,8 @@ DvlceCapsuleEditor::DvlceCapsuleEditor(DvlceCapsuleProcessor& p) : AudioProcesso
         addAndMakeVisible(l);
     }
     setResizable(true, true);
-    setResizeLimits(720, 400, 1600, 900);
-    setSize(820, 440);
+    setResizeLimits(1100, 500, 1600, 900);
+    setSize(1100, 520);
     startTimerHz(5);
     timerCallback();
 }
@@ -47,7 +46,9 @@ DvlceCapsuleEditor::DvlceCapsuleEditor(DvlceCapsuleProcessor& p) : AudioProcesso
 DvlceCapsuleEditor::~DvlceCapsuleEditor() { setLookAndFeel(nullptr); }
 
 void DvlceCapsuleEditor::setupKnob(Knob& k, const char* id, const char* text) {
-    k.slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 110, 20);
+    k.slider.setBufferedToImage(true);
+    k.label.setBufferedToImage(true);
+    k.slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 138, 26);
     k.label.setText(text, juce::dontSendNotification);
     k.label.setJustificationType(juce::Justification::centred);
     k.label.setColour(juce::Label::textColourId, kText);
@@ -59,6 +60,8 @@ void DvlceCapsuleEditor::setupKnob(Knob& k, const char* id, const char* text) {
 }
 
 void DvlceCapsuleEditor::setupChoice(Choice& c, const char* id, const char* text) {
+    c.box.setBufferedToImage(true);
+    c.label.setBufferedToImage(true);
     c.box.addItemList(proc.params.getParameter(id)->getAllValueStrings(), 1);
     c.label.setText(text, juce::dontSendNotification);
     c.label.setColour(juce::Label::textColourId, kText);
@@ -90,6 +93,7 @@ void DvlceCapsuleEditor::chooseFile(int slot) {
 }
 
 void DvlceCapsuleEditor::timerCallback() {
+    look.reportActivity(proc.uiActivity.load(std::memory_order_relaxed));
     status.setText(loadError.isNotEmpty() ? loadError : proc.statusText(), juce::dontSendNotification);
     status.setColour(juce::Label::textColourId, loadError.isNotEmpty() ? juce::Colours::orangered : kDim);
     const juce::String h = proc.userFileName(0), v = proc.userFileName(1);
@@ -101,24 +105,22 @@ void DvlceCapsuleEditor::timerCallback() {
 }
 
 void DvlceCapsuleEditor::paint(juce::Graphics& g) {
-    g.fillAll(kBg);
-    auto r = getLocalBounds().reduced(12);
-    auto head = r.removeFromTop(40);
-    g.setColour(kText);
-    g.setFont(juce::FontOptions(22.0f, juce::Font::bold));
-    g.drawText("Dvlce Capsule", head.removeFromLeft(240), juce::Justification::centredLeft);
-    g.setColour(kDim);
-    g.setFont(juce::FontOptions(13.0f));
-    g.drawText("v" DVLCE_CAPSULE_VERSION "   dual-capsule virtual microphone   in 1 = front capsule, in 2 = rear capsule",
-               head, juce::Justification::centredLeft);
-    g.setColour(kPanel);
-    g.fillRoundedRectangle(getLocalBounds().reduced(12).withTrimmedTop(48).withHeight(112).toFloat(), 6.0f);
-    g.fillRoundedRectangle(getLocalBounds().reduced(12).withTrimmedTop(168).withTrimmedBottom(52).toFloat(), 6.0f);
+    if (!background.isValid()) {
+        background = juce::Image(juce::Image::RGB, getWidth(), getHeight(), false);
+        juce::Graphics cached(background);
+        dvlce::ui::Theme::Scope scope(*this);
+        cached.fillAll(kBg);
+        dvlce::ui::Theme::glass(cached, getLocalBounds().reduced(12).withTrimmedTop(88).withHeight(116).toFloat());
+        dvlce::ui::Theme::glass(cached, getLocalBounds().reduced(12).withTrimmedTop(204).withTrimmedBottom(44).toFloat());
+    }
+    g.drawImageAt(background, 0, 0);
 }
 
 void DvlceCapsuleEditor::resized() {
+    background = {};
     auto r = getLocalBounds().reduced(20);
-    r.removeFromTop(44);
+    header.setBounds(12, 12, getWidth()-24, 76);
+    r.removeFromTop(80);
     auto top = r.removeFromTop(100);
     auto row1 = top.removeFromTop(30);
     auto slotRow = [](juce::Rectangle<int>& row, Choice& c, juce::TextButton* b, int w) {
@@ -140,7 +142,7 @@ void DvlceCapsuleEditor::resized() {
 
     auto bottom = r.removeFromBottom(40);
     status.setBounds(bottom.withTrimmedTop(16));
-    r.removeFromTop(16);
+    r.removeFromTop(28);
     Knob* knobs[] = {&pattern, &patternRear, &sourceDist, &virtualDist, &proxCap, &offAxis, &output};
     const int w = r.getWidth() / 7;
     for (auto* k : knobs) {

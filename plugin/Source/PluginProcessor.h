@@ -46,6 +46,7 @@ public:
     juce::String userFileName(int slot) const;
 
     juce::AudioProcessorValueTreeState params;
+    std::atomic<float> uiActivity{0.0f}; // Audio level only; never changes the sound.
 
 private:
     struct Selection {
