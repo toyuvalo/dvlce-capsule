@@ -10,6 +10,7 @@ DvlceCapsuleEditor::DvlceCapsuleEditor(DvlceCapsuleProcessor& p) : AudioProcesso
     header(p, p.params, look, "Capsule", "dvlce-capsule", DVLCE_CAPSULE_VERSION, "DUAL-CAPSULE VIRTUAL MICROPHONE  /  INPUT 1 FRONT  /  INPUT 2 REAR") {
     setLookAndFeel(&look);
     addAndMakeVisible(header);
+    header.setBufferedToImage(true);
 
     setupChoice(hardware, "hardware", "Hardware");
     setupChoice(voicing, "voicing", "Voicing");
@@ -45,6 +46,8 @@ DvlceCapsuleEditor::DvlceCapsuleEditor(DvlceCapsuleProcessor& p) : AudioProcesso
 DvlceCapsuleEditor::~DvlceCapsuleEditor() { setLookAndFeel(nullptr); }
 
 void DvlceCapsuleEditor::setupKnob(Knob& k, const char* id, const char* text) {
+    k.slider.setBufferedToImage(true);
+    k.label.setBufferedToImage(true);
     k.slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 138, 26);
     k.label.setText(text, juce::dontSendNotification);
     k.label.setJustificationType(juce::Justification::centred);
@@ -57,6 +60,8 @@ void DvlceCapsuleEditor::setupKnob(Knob& k, const char* id, const char* text) {
 }
 
 void DvlceCapsuleEditor::setupChoice(Choice& c, const char* id, const char* text) {
+    c.box.setBufferedToImage(true);
+    c.label.setBufferedToImage(true);
     c.box.addItemList(proc.params.getParameter(id)->getAllValueStrings(), 1);
     c.label.setText(text, juce::dontSendNotification);
     c.label.setColour(juce::Label::textColourId, kText);
@@ -100,13 +105,19 @@ void DvlceCapsuleEditor::timerCallback() {
 }
 
 void DvlceCapsuleEditor::paint(juce::Graphics& g) {
-    g.fillAll(kBg);
-    dvlce::ui::Theme::Scope scope(*this);
-    dvlce::ui::Theme::glass(g, getLocalBounds().reduced(12).withTrimmedTop(88).withHeight(116).toFloat());
-    dvlce::ui::Theme::glass(g, getLocalBounds().reduced(12).withTrimmedTop(204).withTrimmedBottom(52).toFloat());
+    if (!background.isValid()) {
+        background = juce::Image(juce::Image::RGB, getWidth(), getHeight(), false);
+        juce::Graphics cached(background);
+        dvlce::ui::Theme::Scope scope(*this);
+        cached.fillAll(kBg);
+        dvlce::ui::Theme::glass(cached, getLocalBounds().reduced(12).withTrimmedTop(88).withHeight(116).toFloat());
+        dvlce::ui::Theme::glass(cached, getLocalBounds().reduced(12).withTrimmedTop(204).withTrimmedBottom(44).toFloat());
+    }
+    g.drawImageAt(background, 0, 0);
 }
 
 void DvlceCapsuleEditor::resized() {
+    background = {};
     auto r = getLocalBounds().reduced(20);
     header.setBounds(12, 12, getWidth()-24, 76);
     r.removeFromTop(80);

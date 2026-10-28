@@ -41,6 +41,7 @@ private:
     DvlceCapsuleProcessor& proc;
     dvlce::ui::DvlceLookAndFeel look{dvlce::ui::ThemeId::Quantum};
     dvlce::ui::QuantumHeader header;
+    juce::Image background;
     Knob pattern, patternRear, sourceDist, virtualDist, proxCap, offAxis, output;
     Choice hardware, voicing, mode;
     Toggle flip, drive;
