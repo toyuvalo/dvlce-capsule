@@ -23,6 +23,7 @@ int main() {
     check(!bank.validParams(invalid), "reject incomplete presets");
     check(!bank.apply(-1), "reject invalid index");
     bank.apply(0);
+    check(processor.loadUserModel(0, juce::File::getCurrentWorkingDirectory().getChildFile("proto/models/capsule-example.json")).isEmpty(), "load custom hardware fixture");
     auto expected = bank.capture();
     const auto name = "CI roundtrip " + juce::Uuid().toString();
     const auto saved = bank.save(name);
@@ -40,6 +41,10 @@ int main() {
     bank.apply(1);
     processor.setStateInformation(state.getData(), static_cast<int>(state.getSize()));
     check(bank.selected() == user, "host state restores preset name");
+    DvlceCapsuleProcessor fresh;
+    fresh.setStateInformation(state.getData(), static_cast<int>(state.getSize()));
+    check(fresh.userFileName(0) == "capsule-example.json", "custom model name survives in a fresh processor");
+    check(fresh.params.getRawParameterValue("hardware")->load() == 2.f, "custom model selection survives");
     // This uniquely named test file was created above on the ephemeral CI runner.
     bank.directory().getChildFile(name+".json").deleteFile();
     std::cout << "PRESET TESTS: " << (failures ? "FAIL" : "PASS") << "\n";

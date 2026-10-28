@@ -103,7 +103,7 @@ void DvlceCapsuleEditor::paint(juce::Graphics& g) {
     g.fillAll(kBg);
     dvlce::ui::Theme::Scope scope(*this);
     dvlce::ui::Theme::glass(g, getLocalBounds().reduced(12).withTrimmedTop(88).withHeight(116).toFloat());
-    dvlce::ui::Theme::glass(g, getLocalBounds().reduced(12).withTrimmedTop(216).withTrimmedBottom(52).toFloat());
+    dvlce::ui::Theme::glass(g, getLocalBounds().reduced(12).withTrimmedTop(204).withTrimmedBottom(52).toFloat());
 }
 
 void DvlceCapsuleEditor::resized() {
@@ -131,7 +131,7 @@ void DvlceCapsuleEditor::resized() {
 
     auto bottom = r.removeFromBottom(40);
     status.setBounds(bottom.withTrimmedTop(16));
-    r.removeFromTop(16);
+    r.removeFromTop(28);
     Knob* knobs[] = {&pattern, &patternRear, &sourceDist, &virtualDist, &proxCap, &offAxis, &output};
     const int w = r.getWidth() / 7;
     for (auto* k : knobs) {

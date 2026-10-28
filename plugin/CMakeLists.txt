@@ -65,5 +65,5 @@ if(MSVC)
 endif()
 
 add_executable(DvlceCapsulePresetTest tools/preset_test.cpp)
-target_link_libraries(DvlceCapsulePresetTest PRIVATE DvlceCapsule)
+target_link_libraries(DvlceCapsulePresetTest PRIVATE DvlceCapsule dvlce_capsule_core)
 target_include_directories(DvlceCapsulePresetTest PRIVATE "${juce_SOURCE_DIR}/modules")
